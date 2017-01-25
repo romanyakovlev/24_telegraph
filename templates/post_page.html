@@ -29,16 +29,20 @@
     <div class="container">
       <form>
         <div class="form-group">
-          <input name="header" class="form-control" placeholder="Заголовок" autofocus/>
+            <input name="post_id" value="{{header}}" class="form-control" type="hidden"/>
         </div>
         <div class="form-group">
-          <input name="signature" class="form-control" placeholder="Подпись"/>
+          <input name="header" value="{{header}}" class="form-control" placeholder="Заголовок" readonly/>
         </div>
         <div class="form-group">
-          <textarea name="body" class="form-control" rows="10" placeholder="Ваша история"></textarea>
+          <input name="signature" value="{{title}}" class="form-control" placeholder="Подпись" readonly/>
         </div>
         <div class="form-group">
-          <a class="btn btn-primary">Опубликовать</a>
+          <textarea name="body" class="form-control" rows="10" placeholder="Ваша история" readonly>{{body}}</textarea>
+        </div>
+        <div class="form-group">
+          <a class="btn btn-primary kek">Редактировать</a>
+          <button type="button" name="button">Прикоснись</button>
         </div>
       </form>
     </div><!-- /.container -->
@@ -46,14 +50,26 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
-        $("a").click(function(){
+        $(".kek").on('click',function(){
+            $("[name='header'],[name='signature'],[name='body']").prop('readonly', false);
+            $(this).removeClass("kek").addClass("noo");
+            $(this).text("Отправить");
+        });
+
+        $("button").on('click',function(){
+            console.log('it works');
             $.ajax({
-                url:"/",
+                url:"/"+$("[name='post_id']").attr("name"),
                 type: "POST",
                 data:$("form").serialize(),
                 success: function(data){
-                    $("form input[name=header]").val(data["header"]);
-                    console.log('all works just fine')
+                    $("form input[name='header']").val(data["header"]);
+                    $("form input[name='signature']").val(data["signature"]);
+                    $("form input[name='body']").val(data["body"]);
+                    console.log('all works just fine');
+                    $("[name='header'],[name='signature'],[name='body']").prop('readonly', true);
+                    $("a").text("Обновить");
+                    $("a").removeClass("btn btn-primary submit-update").addClass("btn btn-primary");
                 },
                 dataType: "json"
             });
