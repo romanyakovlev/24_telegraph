@@ -13,15 +13,14 @@ def form():
 
 
 @app.route('/<post_id>', methods=['GET', 'POST'])
-def post(post_id):
+def post_page(post_id):
     if request.method == "GET":
         post_dict = get_header(post_id)
         if not post_dict:
             return 'No {} in base'.format(post_id)
-        print(post_dict)
         return render_template('post_page.html', **post_dict)
     if request.method == "POST":
-        updated_form_dict = update_row(**request.form)
+        updated_form_dict = update_row(request.form)
         print(updated_form_dict)
         return jsonify(**updated_form_dict)
 
