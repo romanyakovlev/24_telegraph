@@ -1,30 +1,47 @@
+from flask import Flask, g
 import sqlite3
 
 
+app = Flask(__name__)
+
+
+DATABASE = 'telegraph.db'
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    db.row_factory = sqlite3.Row
+    return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+
+def query_db(query, args=(), one=False):
+    db = get_db()
+    cur = db.execute(query, args)
+    rv = cur.fetchall()
+    db.commit()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+
 def get_header(header):
-    conn = sqlite3.connect('telegraph.db')
-    c = conn.cursor()
-    post_info = c.execute("SELECT * FROM telegraphs WHERE header=?",
-                          (header,)).fetchone()
-    conn.commit()
-    conn.close()
-    if not post_info:
-        return None
-    post_dict = {'header':  post_info[0], 'signature': post_info[1],
-                 'body': post_info[2]}
-    return post_dict
+    return query_db("SELECT * FROM telegraphs WHERE header=?",
+                    (header,), one=True)
 
 
 def update_row(post_dict):
-    conn = sqlite3.connect('telegraph.db')
-    c = conn.cursor()
-    print(post_dict['signature'])
-    c.execute("UPDATE telegraphs SET signature=?,body=? WHERE header=?",
-              (post_dict['signature'], post_dict['body'], post_dict['header']))
-    post_info = c.execute("SELECT * FROM telegraphs WHERE header=?",
-                          (post_dict['header'],)).fetchone()
-    conn.commit()
-    conn.close()
-    post_dict_ = {'header':  post_info[0], 'signature': post_info[1],
-                  'body': post_info[2]}
-    return post_dict_
+    query_db("UPDATE telegraphs SET signature=?,body=? WHERE header=?",
+             (post_dict['signature'], post_dict['body'],
+              post_dict['header']), one=True)
+    b = query_db("SELECT * FROM telegraphs WHERE header=?",
+                 (post_dict['header'],), one=True)
+    print(b['body'])
+    return b

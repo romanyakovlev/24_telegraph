@@ -21,7 +21,6 @@ def post_page(post_id):
         return render_template('post_page.html', **post_dict)
     if request.method == "POST":
         updated_form_dict = update_row(request.form)
-        print(updated_form_dict)
         return jsonify(**updated_form_dict)
 
 
