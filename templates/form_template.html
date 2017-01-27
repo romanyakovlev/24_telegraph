@@ -1,0 +1,17 @@
+      <form>
+        <div class="form-group">
+            <input name="post_id" value="{{post_id}}" class="form-control" type="hidden"/>
+        </div>
+        <div class="form-group">
+          <input name="header" value="{{header}}" class="form-control" placeholder="Заголовок" readonly/>
+        </div>
+        <div class="form-group">
+          <input name="signature" value="{{signature}}" class="form-control" placeholder="Подпись" readonly/>
+        </div>
+        <div class="form-group">
+          <textarea name="body" class="form-control" rows="10" placeholder="Ваша история" readonly>{{body}}</textarea>
+        </div>
+        <div class="form-group">
+          <a class="btn btn-primary post-edit">Редактировать</a>
+        </div>
+      </form>

@@ -28,9 +28,9 @@
     </nav>
 
     <div class="container">
-      <form>
+      <form >
         <div class="form-group">
-            <input name="post_id" value="{{header}}" class="form-control" type="hidden"/>
+            <input name="post_id" value="{{post_id}}" class="form-control" type="hidden"/>
         </div>
         <div class="form-group">
           <input name="header" value="{{header}}" class="form-control" placeholder="Заголовок" readonly/>
@@ -69,7 +69,7 @@
                     $("form input[name='body']").val(data["body"]);
                     console.log('all works just fine');
                     $("[name='header'],[name='signature'],[name='body']").prop('readonly', true);
-                    $("a").text("Редактировать");
+                    $("a.post-submit").text("Редактировать");
                     $("a").removeClass("post-submit").addClass("post-edit");
                 },
                 dataType: "json"
