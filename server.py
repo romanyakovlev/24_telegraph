@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, make_response
 from sqlite_logic import get_post, update_post, create_post
 import json
+import os
 
 app = Flask(__name__)
 
