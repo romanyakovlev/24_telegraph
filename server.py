@@ -46,6 +46,8 @@ def start_page():
 def post_page(post_id):
     if request.method == "GET":
         post_dict = get_post(post_id)
+        if not post_dict:
+            return "У нас нету поста с id '{}'. Наверное, вы ошиблись.".format(post_id)
         can_you_edit = check_post_id_in_list(post_id)
         return render_template('post_page.html', can_you_edit=can_you_edit, **post_dict)
     if request.method == "POST":
@@ -54,6 +56,4 @@ def post_page(post_id):
 
 
 if __name__ == "__main__":
-     app.debug = True
-     port = int(os.environ.get("PORT", 5000))
-     app.run(host='0.0.0.0', port=port)
+     app.run(host='0.0.0.0', port=8080)
