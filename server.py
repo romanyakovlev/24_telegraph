@@ -1,30 +1,54 @@
-from flask import Flask, render_template, request, jsonify
-from sql_run import get_post, update_row, create_post
+from flask import Flask, render_template, request, jsonify, make_response
+from sqlite_logic import get_post, update_post, create_post
+import json
 
 app = Flask(__name__)
 
+
+def update_or_create_cookie_list(post_id):
+    cookie_data = request.cookies.get('post_ids')
+    if cookie_data:
+        post_id_cookie_list = json.loads(cookie_data)
+    else:
+        post_id_cookie_list = []
+    if post_id_cookie_list:
+        post_id_cookie_list.append(post_id)
+    else:
+        post_id_cookie_list = [post_id]
+    return post_id_cookie_list
+
+
+def check_post_id_in_list(post_id):
+    cookie_data = request.cookies.get('post_ids')
+    if cookie_data:
+        post_id_cookie_list = json.loads(cookie_data)
+    else:
+        post_id_cookie_list = []
+    can_you_edit = bool(int(post_id) in post_id_cookie_list)
+    return can_you_edit
+
+
 @app.route('/', methods=['GET', 'POST'])
-def form():
+def start_page():
     if request.method == "GET":
-        return render_template('form.html')
+        return render_template('start_page.html')
     if request.method == "POST":
         post_id = create_post(request.form)
-        return jsonify({'post_id':post_id})
+        post_header = get_post(post_id)['header']
+        response = make_response(jsonify({'post_id': post_id, 'post_header': post_header}))
+        post_id_cookie_list = update_or_create_cookie_list(post_id)
+        response.set_cookie('post_ids', json.dumps(post_id_cookie_list))
+        return response
 
 
-@app.route('/json/post/<post_id>', methods=['GET'])
-def get_post_json(post_id):
-    if request.method == "GET":
-        post_dict = get_post(post_id)
-        return jsonify(**post_dict)
-
-
-@app.route('/post/<post_id>', methods=['GET', 'POST'])
+@app.route('/<post_id>', methods=['GET', 'POST'])
 def post_page(post_id):
     if request.method == "GET":
-        return render_template('form.html')
+        post_dict = get_post(post_id)
+        can_you_edit = check_post_id_in_list(post_id)
+        return render_template('post_page.html', can_you_edit=can_you_edit, **post_dict)
     if request.method == "POST":
-        updated_form_dict = update_row(request.form)
+        updated_form_dict = update_post(request.form)
         return jsonify(**updated_form_dict)
 
 

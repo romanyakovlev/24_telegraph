@@ -27,30 +27,42 @@
     </nav>
 
     <div class="container">
-      <form id="get_form" >
-        <div class="form-group" style="margin:0px;">
-            <input name="post_id" value="{{post_id}}" class="form-control" type="hidden"/>
-        </div>
-        <div class="form-group">
-          <input name="header" value="{{header}}" class="form-control" placeholder="Заголовок" readonly/>
-        </div>
-        <div class="form-group">
-          <input name="signature" value="{{signature}}" class="form-control" placeholder="Подпись" readonly/>
-        </div>
-        <div class="form-group">
-          <textarea name="body" class="form-control" rows="10" placeholder="Ваша история" readonly>{{body}}</textarea>
-        </div>
-        {% if can_you_edit %}
-        <div class="form-group">
-          <a class="btn btn-primary post-edit">Редактировать</a>
-        </div>
-        {% endif %}
-      </form>
+        <form id="replace_form">
+            <div class="form-group">
+              <input name="header" class="form-control" placeholder="Заголовок" autofocus/>
+            </div>
+            <div class="form-group">
+              <input name="signature" class="form-control" placeholder="Подпись"/>
+            </div>
+            <div class="form-group">
+              <textarea name="body" class="form-control" rows="10" placeholder="Ваша история"></textarea>
+            </div>
+            <div class="form-group">
+              <a class="btn btn-primary post-create">Опубликовать</a>
+            </div>
+        </form>
     </div><!-- /.container -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-history-api/4.2.7/history.min.js"></script>
     <script>
+        $(document).on("click",'.post-create',function(){
+            $.ajax({
+                url:"/",
+                type: "POST",
+                data:$("form").serialize(),
+                success: function(data){
+                    history.replaceState(null, null, '/'+data["post_id"]);
+                    $.ajax({url: window.location.href, success: function(res){
+                        $(document).attr("title", data["post_header"]);
+                        $('#replace_form').html($(res).find('#get_form'));
+                    }});
+                },
+                dataType: "json"
+            });
+        });
+
         $(document).on("click", ".post-edit", function(){
             $("[name='header'],[name='signature'],[name='body']").prop('readonly', false);
             $("a.post-edit").removeClass("post-edit").addClass("post-submit");

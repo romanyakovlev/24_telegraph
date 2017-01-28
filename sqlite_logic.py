@@ -35,10 +35,10 @@ def query_db(query, args=(), one=False, lastrowid_show=False):
 
 def get_post(post_id):
     return query_db("SELECT * FROM telegraphs WHERE post_id=?",
-                    (post_id,), one=True)
+                               (post_id,), one=True)
 
 
-def update_row(post_dict):
+def update_post(post_dict):
     query_db("UPDATE telegraphs SET signature=?,body=?,header=? WHERE post_id=?",
              (post_dict['signature'], post_dict['body'], post_dict['header'],
               post_dict['post_id']), one=True)
