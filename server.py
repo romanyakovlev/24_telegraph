@@ -47,7 +47,7 @@ def post_page(post_id):
     if request.method == "GET":
         post_dict = get_post(post_id)
         if not post_dict:
-            return "У нас нету поста с id '{}'. Наверное, вы ошиблись.".format(post_id)
+            return "У нас нету поста с id '{}'. Наверное, вы ошиблись.<a href='/'><h1>Главная</h3></a>".format(post_id)
         can_you_edit = check_post_id_in_list(post_id)
         return render_template('post_page.html', can_you_edit=can_you_edit, **post_dict)
     if request.method == "POST":
