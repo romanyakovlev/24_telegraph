@@ -2,6 +2,8 @@
 
 Simple [telegra.ph](http://telegra.ph) clone. Ready for deploying on heroku.
 
+# (Example on Heroku)[http://warm-cove-24655.herokuapp.com]
+
 # What uses:
 - JQuery/AJAX
 - History API
