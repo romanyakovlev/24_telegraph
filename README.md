@@ -1,6 +1,23 @@
 # Telegraph Clone
 
-{TODO. There will be project description}
+Simple [telegra.ph](http://telegra.ph) clone. Ready for deploying on heroku.
+
+# What uses:
+- JQuery/AJAX
+- History API
+- Flask
+- SQLite3
+
+# Installing
+
+clone repo:
+```sh
+git clone https://github.com/romanyakovlev/24_telegraph
+```
+if you want to run app locally:
+```sh
+python3 server.py
+```
 
 # Project Goals
 
