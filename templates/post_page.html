@@ -42,7 +42,7 @@
         </div>
         {% if can_you_edit %}
         <div class="form-group">
-          <a class="btn btn-primary post-edit">Редактировать</a>
+          <a class="btn btn-primary js-post-edit">Редактировать</a>
         </div>
         {% endif %}
       </form>
@@ -51,15 +51,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
-        $(document).on("click", ".post-edit", function(){
+        $(document).on("click", ".js-post-edit", function(){
             $("[name='header'],[name='signature'],[name='body']").prop('readonly', false);
-            $("a.post-edit").removeClass("post-edit").addClass("post-submit");
-            $("a.post-submit").text("Отправить");
+            $("a.js-post-edit").removeClass("js-post-edit").addClass("js-post-submit");
+            $("a.js-post-submit").text("Отправить");
         });
 
-        $(document).on("click", ".post-submit", function(){
+        $(document).on("click", ".js-post-submit", function(){
             $.ajax({
-                url:"/"+$("[name='post_id']").attr("name"),
+                url:"/"+$("[name='post_id']").attr("value"),
                 type: "POST",
                 data:$("form").serialize(),
                 success: function(data){
@@ -67,8 +67,8 @@
                     $("form input[name='signature']").val(data["signature"]);
                     $("form input[name='body']").val(data["body"]);
                     $("[name='header'],[name='signature'],[name='body']").prop('readonly', true);
-                    $("a.post-submit").text("Редактировать");
-                    $("a.post-submit").removeClass("post-submit").addClass("post-edit");
+                    $("a.js-post-submit").text("Редактировать");
+                    $("a.js-post-submit").removeClass("js-post-submit").addClass("js-post-edit");
                 },
                 dataType: "json"
             });

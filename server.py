@@ -1,28 +1,38 @@
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response, abort
 from sqlite_logic import get_post, update_post, create_post
 import json
 import os
+from cryptography.fernet import Fernet
+
+
+key = Fernet.generate_key()
+f = Fernet(key)
 
 app = Flask(__name__)
 
 
+
 def update_or_create_cookie_list(post_id):
+
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(cookie_data)
+        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
     else:
         post_id_cookie_list = []
     if post_id_cookie_list:
         post_id_cookie_list.append(post_id)
     else:
         post_id_cookie_list = [post_id]
+
     return post_id_cookie_list
+
+
 
 
 def check_post_id_in_list(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(cookie_data)
+        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode()).decode())
     else:
         post_id_cookie_list = []
     can_you_edit = bool(int(post_id) in post_id_cookie_list)
@@ -38,7 +48,7 @@ def start_page():
         post_header = get_post(post_id)['header']
         response = make_response(jsonify({'post_id': post_id, 'post_header': post_header}))
         post_id_cookie_list = update_or_create_cookie_list(post_id)
-        response.set_cookie('post_ids', json.dumps(post_id_cookie_list))
+        response.set_cookie('post_ids', f.encrypt(json.dumps(post_id_cookie_list).encode('utf-8')))
         return response
 
 
@@ -47,7 +57,7 @@ def post_page(post_id):
     if request.method == "GET":
         post_dict = get_post(post_id)
         if not post_dict:
-            return "У нас нету поста с id '{}'. Наверное, вы ошиблись.<a href='/'><h1>Главная</h3></a>".format(post_id)
+            abort(404)
         can_you_edit = check_post_id_in_list(post_id)
         return render_template('post_page.html', can_you_edit=can_you_edit, **post_dict)
     if request.method == "POST":
