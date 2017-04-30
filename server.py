@@ -1,19 +1,11 @@
-from flask import Flask, render_template, request, jsonify, make_response, abort
+from flask import render_template, request, jsonify, make_response, abort
 from sqlite_logic import get_post, update_post, create_post
+from settings import app, f
 import json
 import os
-from cryptography.fernet import Fernet
-
-
-key = Fernet.generate_key()
-f = Fernet(key)
-
-app = Flask(__name__)
-
 
 
 def update_or_create_cookie_list(post_id):
-
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
         post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
@@ -23,16 +15,13 @@ def update_or_create_cookie_list(post_id):
         post_id_cookie_list.append(post_id)
     else:
         post_id_cookie_list = [post_id]
-
     return post_id_cookie_list
-
-
 
 
 def check_post_id_in_list(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode()).decode())
+        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
     else:
         post_id_cookie_list = []
     can_you_edit = bool(int(post_id) in post_id_cookie_list)
