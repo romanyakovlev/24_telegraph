@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, make_response, abort
+from flask import render_template, request, jsonify, make_response, abort, send_from_directory
 from sqlite_logic import get_post, update_post, create_post
 from settings import app, f
 import json
@@ -8,7 +8,7 @@ import os
 def update_or_create_cookie_list(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
+        post_id_cookie_list = json.loads(cookie_data)
     else:
         post_id_cookie_list = []
     if post_id_cookie_list:
@@ -21,12 +21,16 @@ def update_or_create_cookie_list(post_id):
 def check_post_id_in_list(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
+        post_id_cookie_list = json.loads(cookie_data)
     else:
         post_id_cookie_list = []
     can_you_edit = bool(int(post_id) in post_id_cookie_list)
     return can_you_edit
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/', methods=['GET', 'POST'])
 def start_page():
@@ -37,14 +41,16 @@ def start_page():
         post_header = get_post(post_id)['header']
         response = make_response(jsonify({'post_id': post_id, 'post_header': post_header}))
         post_id_cookie_list = update_or_create_cookie_list(post_id)
-        response.set_cookie('post_ids', f.encrypt(json.dumps(post_id_cookie_list).encode('utf-8')))
+        response.set_cookie('post_ids', json.dumps(post_id_cookie_list))
         return response
 
 
 @app.route('/<post_id>', methods=['GET', 'POST'])
 def post_page(post_id):
     if request.method == "GET":
+
         post_dict = get_post(post_id)
+        print(post_dict)
         if not post_dict:
             abort(404)
         can_you_edit = check_post_id_in_list(post_id)
