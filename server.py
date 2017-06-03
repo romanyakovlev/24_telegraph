@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify, make_response, abort, send_from_directory
-from sqlite_logic import get_post, update_post, create_post
+from postgresql_logic import get_post, update_post, create_post
 from settings import app, f
 import json
 import os
