@@ -8,7 +8,8 @@ Simple [telegra.ph](http://telegra.ph) clone. Ready for deploying on heroku.
 - JQuery/AJAX
 - History API
 - Flask
-- SQLite3
+- PostgreSQL
+- Cryptography
 
 # Installing
 
@@ -20,7 +21,7 @@ if you want to run app locally:
 ```sh
 python3 server.py
 ```
-Also you can deploy app on heroku by following this [Tutorial](http://kennmyers.github.io/tutorial/2016/03/11/getting-flask-on-heroku.html) 
+Also you can deploy app on heroku by following this [Tutorial](http://kennmyers.github.io/tutorial/2016/03/11/getting-flask-on-heroku.html)
 
 # Project Goals
 
