@@ -1,7 +1,7 @@
 from flask import Flask, g
 import psycopg2
 import psycopg2.extras
-settings import app, url
+from settings import app, url
 
 
 def get_db():
