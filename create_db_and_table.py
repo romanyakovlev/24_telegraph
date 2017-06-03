@@ -1,7 +1,14 @@
 import psycopg2
-from settings import path_to_db_file
+from settings import url
 
-conn = psycopg2.connect("dbname='test_python' user='roman1' host='localhost' password='password'" )
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
 c = conn.cursor()
 c.execute('''CREATE TABLE telegraphs
                 (post_id SERIAL NOT NULL,
