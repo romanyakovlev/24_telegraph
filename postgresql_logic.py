@@ -1,15 +1,19 @@
 from flask import Flask, g
 import psycopg2
 import psycopg2.extras
-
-app = Flask(__name__)
-DATABASE = 'telegraph.db'
+from settings import app, url
 
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = psycopg2.connect("dbname='test_python' user='roman1' host='localhost' password='password'" )
+        db = g._database = psycopg2.connect(
+            database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port
+        )
     return db
 
 

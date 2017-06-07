@@ -1,27 +1,24 @@
 from flask import render_template, request, jsonify, make_response, abort, send_from_directory
-from sqlite_logic import get_post, update_post, create_post
+from postgresql_logic import get_post, update_post, create_post
 from settings import app, f
 import json
 import os
 
 
-def update_or_create_cookie_list(post_id):
+def append_post_id_to_cookies(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(cookie_data)
+        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode('utf-8')).decode())
     else:
         post_id_cookie_list = []
-    if post_id_cookie_list:
-        post_id_cookie_list.append(post_id)
-    else:
-        post_id_cookie_list = [post_id]
-    return post_id_cookie_list
+    post_id_cookie_list.append(post_id)
+    return list(set(post_id_cookie_list))
 
 
 def check_post_id_in_list(post_id):
     cookie_data = request.cookies.get('post_ids')
     if cookie_data:
-        post_id_cookie_list = json.loads(cookie_data)
+        post_id_cookie_list = json.loads(f.decrypt(cookie_data.encode()).decode())
     else:
         post_id_cookie_list = []
     can_you_edit = bool(int(post_id) in post_id_cookie_list)
@@ -30,7 +27,8 @@ def check_post_id_in_list(post_id):
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+                                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def start_page():
@@ -40,17 +38,15 @@ def start_page():
         post_id = create_post(request.form)
         post_header = get_post(post_id)['header']
         response = make_response(jsonify({'post_id': post_id, 'post_header': post_header}))
-        post_id_cookie_list = update_or_create_cookie_list(post_id)
-        response.set_cookie('post_ids', json.dumps(post_id_cookie_list))
+        post_id_cookie_list = append_post_id_to_cookies(post_id)
+        response.set_cookie('post_ids', f.encrypt(json.dumps(post_id_cookie_list).encode('utf-8')))
         return response
 
 
 @app.route('/<post_id>', methods=['GET', 'POST'])
 def post_page(post_id):
     if request.method == "GET":
-
         post_dict = get_post(post_id)
-        print(post_dict)
         if not post_dict:
             abort(404)
         can_you_edit = check_post_id_in_list(post_id)
