@@ -36,7 +36,7 @@ def query_db(query, args=(), one=False, lastrowid_show=False):
     cur.close()
     if lastrowid_show is True:
         return rv[0][0]
-    return rv[0]
+    return rv[0] if rv else None
 
 
 def get_post(post_id):
